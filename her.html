@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Her View">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="icon-her-192.png">
+<link rel="manifest" href="her-manifest.json">
+<title>Her View</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Josefin+Sans:wght@100;200;300;400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000;--surface:#0d0d0d;--border:#1e1e1e;
+  --p:#c87090;--pdim:rgba(200,112,144,.5);--pfaint:rgba(200,112,144,.1);
+  --text:#f8f8f8;--text2:#a8a8a8;--text3:#686868;
+  --radius:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:16px;line-height:1.6}
+#app{max-width:520px;margin:0 auto;padding:0 16px 80px}
+.nav-tabs{display:flex;border-bottom:1px solid rgba(200,112,144,.15);margin-bottom:20px}
+.nav-tab{flex:1;padding:14px 8px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#555;text-align:center;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;transition:all .15s}
+.nav-tab.active{color:var(--p);border-bottom-color:var(--p)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.hdr{text-align:center;padding:36px 0 24px;border-bottom:1px solid var(--pfaint);margin-bottom:24px}
+.hdr-title{font-family:'Cormorant',serif;font-size:34px;font-weight:300;color:var(--p);letter-spacing:.08em;margin-bottom:6px}
+.hdr-sub{font-size:12px;color:var(--pdim);letter-spacing:.08em;text-transform:uppercase}
+.hdr-gen{font-size:11px;color:#333;margin-top:10px}
+.hdr-stale{font-size:11px;color:#e05828;margin-top:6px;font-style:italic}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card-rose{background:rgba(200,112,144,.04);border-color:rgba(200,112,144,.2)}
+.sec-lbl{font-family:'Josefin Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--pdim);margin-bottom:10px}
+.entry-list{border:1px solid rgba(200,112,144,.15);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.entry-row{border-top:1px solid rgba(200,112,144,.08)}.entry-row:first-child{border-top:none}
+.entry-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none}
+.entry-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.entry-meta{flex:1;min-width:0}
+.entry-date-lbl{font-family:'Josefin Sans',sans-serif;font-size:10px;color:var(--pdim);letter-spacing:.06em;margin-bottom:2px}
+.entry-preview{font-size:13px;color:rgba(255,255,255,.4);font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.entry-chev{font-size:16px;color:rgba(200,112,144,.28);flex-shrink:0;transition:transform .18s}
+.entry-body{display:none;padding:0 14px 14px;border-top:1px solid rgba(200,112,144,.06)}
+.entry-body.open{display:block}
+.entry-note{font-size:15px;color:rgba(255,255,255,.8);line-height:1.75;margin:12px 0 0;font-style:italic}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{border:1px solid rgba(200,112,144,.12);border-radius:var(--radius);padding:12px;text-align:center;background:rgba(200,112,144,.03)}
+.stat-val{font-family:'Cormorant',serif;font-size:22px;color:var(--p);font-weight:300;line-height:1}
+.stat-lbl{font-family:'Josefin Sans',sans-serif;font-size:9px;color:rgba(200,112,144,.38);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.ev-input{width:100%;background:#000;border:1px solid #2a2a2a;border-radius:6px;padding:10px 12px;color:#fff;font-size:15px;font-family:'Inter',sans-serif;outline:none;display:block;color-scheme:dark}
+.ev-input:focus{border-color:rgba(200,112,144,.4)}
+.ev-btn{font-family:'Josefin Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:11px 18px;border-radius:6px;cursor:pointer;border:1px solid #222;background:#0a0a0a;color:#666}
+.ev-btn.primary{border-color:rgba(200,112,144,.4);background:rgba(200,112,144,.08);color:var(--p)}
+.ev-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--p);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px}
+.ev-date-lbl{font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.ev-title-txt{font-size:15px;color:var(--text);margin-bottom:2px}
+.ev-note-txt{font-size:13px;color:var(--text3);font-style:italic;margin-top:3px}
+.ev-del{background:none;border:none;color:#333;font-size:14px;cursor:pointer;padding:0 4px;flex-shrink:0}
+.footer{text-align:center;padding:28px 0 8px;font-family:'Josefin Sans',sans-serif;font-size:10px;color:#2a2a2a;letter-spacing:.12em;text-transform:uppercase}
+.msg{text-align:center;padding:80px 24px;font-style:italic;color:var(--pdim);line-height:1.8}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(200,112,144,.3);color:var(--p);font-family:'Josefin Sans',sans-serif;font-size:11px;letter-spacing:.1em;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-title">Her View</div>
+    <div class="hdr-sub">A window into his inner weather</div>
+    <div id="hdr-meta"></div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('mood')">How He's Been</button>
+    <button class="nav-tab" onclick="showTab('events')">My Events</button>
+    <button class="nav-tab" onclick="showTab('mind')">His Mind</button>
+  </div>
+  <div id="tab-mood" class="tab-panel active"><div id="mood-root"><div class="msg">Loading\u2026</div></div></div>
+  <div id="tab-events" class="tab-panel"><div id="events-root"></div></div>
+  <div id="tab-mind" class="tab-panel"><div id="mind-root"></div></div>
+</div>
+<div id="toast"></div>
+
+<script>
+var MOOD_LABELS={1:'Collapsed',2:'Low',3:'Difficult',4:'Flat',5:'Neutral',6:'Stable',7:'Grounded',8:'Focused',9:'Sharp',10:'Sovereign'};
+var EV_KEY='imperium_her_events';
+
+function scorePhrase(s){var P={1:'He\'s really struggling right now \u2014 this is a hard day for him.',2:'He\'s having a rough day. A little extra warmth from you would go a long way.',3:'Things feel heavy for him today. He\'s pushing through something difficult.',4:'He\'s a bit off today \u2014 not quite himself, but he\'s still showing up.',5:'He\'s holding steady \u2014 not really up or down, just getting through.',6:'He\'s doing okay today \u2014 feeling solid and level.',7:'He\'s feeling really good today \u2014 centered and at ease.',8:'He\'s in a strong place right now \u2014 sharp, purposeful, and locked in.',9:'He\'s having a great day \u2014 really clear and full of energy.',10:'He\'s at his absolute best today. This is him fully in his element.'};return P[s]||'He had an ordinary kind of day.';}
+function dotColor(s){return s<=3?'#c55':s<=5?'#888':s<=7?'#18c48a':'#f0c040';}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+
+function showTab(name){
+  document.querySelectorAll('.nav-tab').forEach(function(b,i){b.classList.toggle('active',['mood','events','mind'][i]===name);});
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='events')renderEvents();
+  if(name==='mind')renderMind();
+}
+
+// ── MOOD ─────────────────────────────────────────────────────────────────────
+function renderMood(){
+  var hash=location.hash.replace(/^#/,'');
+  var meta=document.getElementById('hdr-meta');
+  if(!hash){document.getElementById('mood-root').innerHTML='<div class="msg">No mood data found.<br>Ask him to share a fresh link.</div>';return;}
+  var data;
+  try{data=JSON.parse(decodeURIComponent(escape(atob(hash))));}
+  catch(e){document.getElementById('mood-root').innerHTML='<div class="msg">Link looks corrupted.<br>Ask him to send a new one.</div>';return;}
+  var ml=data.d||{};
+  var genAt=data.g?new Date(data.g):null;
+  var entries=Object.entries(ml).filter(function(e){return e[1]&&e[1].s;}).sort(function(a,b){return a[0]<b[0]?-1:1;});
+  if(!entries.length){document.getElementById('mood-root').innerHTML='<div class="msg">Nothing logged yet \u2014 check back soon.</div>';return;}
+  var scores=entries.map(function(e){return e[1].s;});
+  var avg=scores.reduce(function(a,b){return a+b;},0)/scores.length;
+  var r7=scores.slice(-7);var avg7=r7.reduce(function(a,b){return a+b;},0)/r7.length;
+  var trendMsg=avg7<=3.5?'He\'s been going through a tough stretch lately. He may not show it openly \u2014 your warmth right now means more than you know.':avg7<=5?'He\'s had some harder days and some okay ones lately. Just being steady and present for him helps more than you might realise.':avg7<=7?'He\'s been doing pretty well overall \u2014 feeling grounded and like himself. Things are in a good place for him right now.':'He\'s been in a really strong place lately \u2014 energized, clear, and feeling like himself. This is a good season for him.';
+  var overallWord=avg>=7.5?'Really well':avg>=6?'Pretty good':avg>=4.5?'Getting by':'Hard stretch';
+  var todayEntry=ml[todayStr()]||null;
+  var lastKey=entries[entries.length-1][0];
+  var daysSince=Math.floor((Date.now()-new Date(lastKey).getTime())/86400000);
+  if(meta){meta.innerHTML=(genAt?'<div class="hdr-gen">Updated \u00b7 '+genAt.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'</div>':'')+(daysSince>3?'<div class="hdr-stale">Last entry '+daysSince+' days ago \u2014 ask for a fresh link.</div>':'');}
+  var h='';
+  h+='<div class="card card-rose"><div class="sec-lbl">Lately</div><p style="font-size:15px;color:rgba(255,255,255,.8);line-height:1.8;font-style:italic;margin:0">'+trendMsg+'</p></div>';
+  if(todayEntry){var tt=todayEntry.p||scorePhrase(todayEntry.s);h+='<div class="card card-rose"><div class="sec-lbl">Today</div><p style="font-size:15px;color:rgba(255,255,255,.82);line-height:1.72;font-style:italic;margin:0">'+tt+'</p></div>';}
+  if(entries.length>=3){h+='<div class="stat-grid"><div class="stat-card"><div class="stat-val">'+overallWord+'</div><div class="stat-lbl">Overall lately</div></div><div class="stat-card"><div class="stat-val" style="color:rgba(255,255,255,.3)">'+entries.length+'</div><div class="stat-lbl">Days logged</div></div></div>';}
+
+  // Mood trend chart
+  if(entries.length>=2){
+    var moodChartData=entries.slice(-30);
+    h+='<div style="background:#0a0a0a;border:1px solid rgba(200,112,144,.12);border-radius:8px;padding:12px;margin-bottom:12px">';
+    h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,112,144,.4);margin-bottom:8px">Mood Trend — Last 30 Days</div>';
+    h+='<canvas id="her-mood-chart" height="80" style="width:100%;display:block"></canvas>';
+    h+='<div style="display:flex;justify-content:space-between;margin-top:4px">';
+    h+='<span style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;color:#333">'+moodChartData[0][0].slice(5)+'</span>';
+    h+='<span style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;color:#333">'+moodChartData[moodChartData.length-1][0].slice(5)+'</span>';
+    h+='</div></div>';
+  }
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,112,144,.4);margin-bottom:8px">Tap a day to read</div>';
+  h+='<div class="entry-list">';
+  entries.slice().reverse().forEach(function(e){
+    var dk=e[0];var s=e[1].s;var txt=e[1].p||scorePhrase(s);var lbl=MOOD_LABELS[s]||'';
+    var preview=txt.length>54?txt.slice(0,54)+'\u2026':txt;
+    h+='<div class="entry-row"><div class="entry-hdr" onclick="toggleE(\''+dk+'\')">';
+    h+='<div class="entry-dot" style="background:'+dotColor(s)+'"></div>';
+    h+='<div class="entry-meta"><div class="entry-date-lbl">'+dk.slice(5)+' \u00b7 '+lbl+'</div><div class="entry-preview">'+preview+'</div></div>';
+    h+='<div id="ec-'+dk+'" class="entry-chev">\u203a</div></div>';
+    h+='<div id="eb-'+dk+'" class="entry-body"><p class="entry-note">'+txt+'</p></div></div>';
+  });
+  // ── PHYSICAL & WELLNESS — always shown ──────────────────────────────
+  var phys=data.phys||null;var hyd=data.hyd||null;
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,112,144,.5);margin:22px 0 10px;border-bottom:1px solid rgba(200,112,144,.1);padding-bottom:5px">Physical &amp; Wellness</div>';
+
+  if(!phys&&!hyd){
+    h+='<div style="background:#0a0a0a;border:1px dashed #1e1e1e;border-radius:8px;padding:16px;margin-bottom:12px;text-align:center">';
+    h+='<p style="font-size:13px;color:#444;font-style:italic;margin:0">Physical and wellness data not included in this link.<br>Ask him to share a fresh link from the updated app.</p>';
+    h+='</div>';
+  }
+
+  if(phys){
+    // ── Activity summary with canvas bar chart ──
+    h+='<div style="background:#0a0a0a;border:1px solid rgba(200,112,144,.12);border-radius:8px;padding:14px;margin-bottom:12px">';
+    h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,112,144,.4);margin-bottom:10px">Activity &amp; Daily Practice</div>';
+    h+='<canvas id="hph-act-chart" height="90" style="width:100%;display:block;margin-bottom:8px"></canvas>';
+    var wkCol2=phys.workouts>=4?'#18c48a':phys.workouts>=2?'#f0c040':'#e05828';
+    var marCol2=phys.martial>=3?'#18c48a':phys.martial>=1?'#f0c040':'#e05828';
+    var strCol2=phys.streak>=7?'#18c48a':phys.streak>=3?'#f0c040':'#e05828';
+    var compCol2=phys.avgComp>=80?'#18c48a':phys.avgComp>=50?'#f0c040':'#e05828';
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;margin-bottom:10px">';
+    h+='<div><div style="font-family:\'Cormorant\',serif;font-size:24px;font-weight:300;color:'+wkCol2+'">'+phys.workouts+'</div><div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#555;line-height:1.3">Workouts<br>14 days</div></div>';
+    h+='<div><div style="font-family:\'Cormorant\',serif;font-size:24px;font-weight:300;color:'+marCol2+'">'+phys.martial+'</div><div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#555;line-height:1.3">Martial<br>14 days</div></div>';
+    h+='<div><div style="font-family:\'Cormorant\',serif;font-size:24px;font-weight:300;color:'+strCol2+'">'+phys.streak+'</div><div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#555;line-height:1.3">Day<br>streak</div></div>';
+    h+='<div><div style="font-family:\'Cormorant\',serif;font-size:24px;font-weight:300;color:'+compCol2+'">'+phys.avgComp+'%</div><div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#555;line-height:1.3">Daily<br>practice</div></div>';
+    h+='</div>';
+    // Warm interpretation
+    var physNote2='';
+    if(phys.workouts===0&&phys.martial===0)physNote2='He hasn\'t logged any physical sessions in the last two weeks. For him, movement is one of the main ways his nervous system stays regulated. When he goes still like this, something is usually off — even if he hasn\'t said so.';
+    else if(phys.workouts>=4&&phys.martial>=3)physNote2='He\'s been showing up physically and staying consistent. That\'s a really good sign — when his body is in a rhythm, his mind usually is too.';
+    else if(phys.streak>=7)physNote2='That '+phys.streak+'-day streak means he\'s been doing his daily practice every single day. For him, this kind of consistency is how he stays anchored. It matters a lot, even if he doesn\'t say so.';
+    else if(phys.streak<=2&&phys.avgComp<50)physNote2='His streak is low and his daily practice is inconsistent right now. For him, this is often an early signal that something is hard — even before he can put words to it.';
+    if(phys.avgComp>=80&&!physNote2)physNote2='His daily checklist is at '+phys.avgComp+'% — that means he\'s completing most of his structure every day. For him, that\'s a meaningful sign that he\'s functioning well.';
+    if(physNote2)h+='<div style="background:rgba(200,112,144,.04);border-radius:5px;padding:10px 12px"><p style="font-size:13px;color:rgba(200,112,144,.75);font-style:italic;line-height:1.65;margin:0">'+physNote2+'</p></div>';
+    h+='</div>';
+  }
+
+  if(hyd&&hyd.data){
+    var hydEntries=Object.entries(hyd.data).sort();
+    var goal=hyd.goal||80;
+    var hydMet=hydEntries.filter(function(e){return e[1]>=goal;}).length;
+    var hydAvg=hydEntries.length?Math.round(hydEntries.reduce(function(a,b){return a+b[1];},0)/hydEntries.length):0;
+    var hydCol2=hydMet>=5?'#18c48a':hydMet>=3?'#5888b0':'#e05828';
+
+    h+='<div style="background:#0a0a0a;border:1px solid rgba(88,136,176,.15);border-radius:8px;padding:14px;margin-bottom:12px">';
+    h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(88,136,176,.45);margin-bottom:10px">Hydration — Last 7 Days</div>';
+    h+='<canvas id="hph-hyd-chart" height="80" style="width:100%;display:block;margin-bottom:6px"></canvas>';
+    // Day labels
+    h+='<div style="display:flex;justify-content:space-between;padding:0 4px;margin-bottom:10px">';
+    hydEntries.forEach(function(e){
+      var d=new Date(e[0]+'T12:00:00');
+      var label=['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];
+      h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;color:#444;flex:1;text-align:center">'+label+'</div>';
+    });
+    h+='</div>';
+    h+='<div style="display:flex;align-items:center;gap:20px">';
+    h+='<div style="text-align:center"><div style="font-family:\'Cormorant\',serif;font-size:28px;font-weight:300;color:'+hydCol2+'">'+hydMet+'</div><div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#555">days at goal</div></div>';
+    h+='<div style="text-align:center"><div style="font-family:\'Cormorant\',serif;font-size:28px;font-weight:300;color:#5888b0">'+hydAvg+'</div><div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#555">avg oz/day</div></div>';
+    h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#444">goal: '+goal+'oz</div>';
+    h+='</div>';
+    if(hydMet<3)h+='<div style="margin-top:10px;background:rgba(224,88,40,.05);border-radius:5px;padding:9px 11px"><p style="font-size:12px;color:rgba(224,88,40,.7);font-style:italic;line-height:1.6;margin:0">Dehydration hits his focus and mood harder than he notices — he often doesn\'t catch it until he crashes. This is one of those quiet things that\'s easy to gently mention.</p></div>';
+    else if(hydMet>=5)h+='<div style="margin-top:10px;background:rgba(24,196,138,.04);border-radius:5px;padding:9px 11px"><p style="font-size:12px;color:rgba(24,196,138,.6);font-style:italic;line-height:1.6;margin:0">He\'s been staying hydrated consistently this week. Small thing, genuinely matters for how he functions.</p></div>';
+    h+='</div>';
+  }
+
+  // Combined read — only show if we have both
+  if(phys&&hyd&&hyd.data){
+    var moodScores7=entries.slice(-7).map(function(e){return e[1].s;});
+    var moodAvg7=moodScores7.length?moodScores7.reduce(function(a,b){return a+b;},0)/moodScores7.length:null;
+    var hydEntries2=Object.entries(hyd.data).sort();
+    var hydMet2=hydEntries2.filter(function(e){return e[1]>=(hyd.goal||80);}).length;
+    var combined='';
+    if(moodAvg7!==null&&moodAvg7<5&&phys.workouts===0)combined='His mood has been low and he hasn\'t been training. These two things tend to feed each other for him. This isn\'t the time to push — it\'s the time to be warm and present.';
+    else if(moodAvg7!==null&&moodAvg7>=7&&phys.streak>=5)combined='His mood is good and his practice streak is solid. These reinforce each other. This is a strong season for him.';
+    else if(hydMet2<2&&moodAvg7!==null&&moodAvg7<6)combined='Low hydration and a below-average mood week often go together for him. If you can casually leave a glass of water somewhere visible, that\'s not small — it actually helps.';
+    if(combined){
+      h+='<div style="border:1px solid rgba(200,112,144,.15);border-radius:8px;padding:13px 14px;margin-bottom:12px;background:rgba(200,112,144,.03)">';
+      h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,112,144,.4);margin-bottom:7px">Putting It Together</div>';
+      h+='<p style="font-size:14px;color:rgba(255,255,255,.72);line-height:1.75;font-style:italic;margin:0">'+combined+'</p>';
+      h+='</div>';
+    }
+  }
+
+  h+='<div class="footer">The Imperium \u00b7 The Sovereign Traditions</div>';
+  document.getElementById('mood-root').innerHTML=h;
+
+  // ── DRAW MOOD CHART ──
+  if(entries.length>=2){
+    setTimeout(function(){
+      var cv=document.getElementById('her-mood-chart');if(!cv)return;
+      var last30=entries.slice(-30);
+      cv.width=cv.offsetWidth||320;
+      var ctx=cv.getContext('2d'),W=cv.width,H=80;
+      ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,W,H);
+      [3,5,7].forEach(function(v){
+        var y=H-6-Math.round(((v-1)/9)*(H-12));
+        ctx.strokeStyle='rgba(200,112,144,.07)';ctx.lineWidth=1;ctx.setLineDash([2,4]);
+        ctx.beginPath();ctx.moveTo(8,y);ctx.lineTo(W-8,y);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='rgba(200,112,144,.22)';ctx.font='8px sans-serif';ctx.textAlign='right';
+        ctx.fillText(v,8,y+3);
+      });
+      var n=last30.length,sx=(W-20)/(Math.max(n-1,1));
+      var sy=function(v){return H-6-Math.round(((v-1)/9)*(H-12));};
+      ctx.beginPath();ctx.strokeStyle='rgba(200,112,144,.55)';ctx.lineWidth=1.5;
+      ctx.shadowColor='rgba(200,112,144,.3)';ctx.shadowBlur=4;
+      last30.forEach(function(e,i){var x=10+i*sx;var y=sy(e[1].s);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});
+      ctx.stroke();ctx.shadowBlur=0;
+      last30.forEach(function(e,i){
+        var x=10+i*sx;var y=sy(e[1].s);
+        var dc=e[1].s<=3?'#c55':e[1].s<=5?'#888':e[1].s<=7?'#18c48a':'#f0c040';
+        ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fillStyle=dc;ctx.fill();
+      });
+      if(n>=7){
+        ctx.beginPath();ctx.strokeStyle='rgba(200,112,144,.2)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+        last30.forEach(function(e,i){
+          if(i<6)return;var w=last30.slice(i-6,i+1).map(function(x){return x[1].s;});
+          var avg=w.reduce(function(a,b){return a+b;},0)/7;
+          var x=10+i*sx;var y=sy(avg);
+          if(i===6)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+        });
+        ctx.stroke();ctx.setLineDash([]);
+      }
+    },150);
+  }
+
+  // ── DRAW ACTIVITY CHART ──
+  if(phys){
+    setTimeout(function(){
+      var ac=document.getElementById('hph-act-chart');if(!ac)return;
+      ac.width=ac.offsetWidth||320;
+      var actx=ac.getContext('2d'),AW=ac.width,AH=90;
+      actx.fillStyle='#0a0a0a';actx.fillRect(0,0,AW,AH);
+      var bars=[
+        {label:'Workouts',sub:'(14 days)',val:phys.workouts,max:10,col:phys.workouts>=4?'#18c48a':phys.workouts>=2?'#f0c040':'#e05828'},
+        {label:'Martial',sub:'(14 days)',val:phys.martial,max:10,col:phys.martial>=3?'#18c48a':phys.martial>=1?'#f0c040':'#e05828'},
+        {label:'Streak',sub:'(days)',val:phys.streak,max:30,col:phys.streak>=7?'#18c48a':phys.streak>=3?'#f0c040':'#e05828'},
+        {label:'Practice',sub:'(7d avg)',val:phys.avgComp,max:100,col:phys.avgComp>=80?'#18c48a':phys.avgComp>=50?'#f0c040':'#e05828'}
+      ];
+      var bw=Math.floor((AW-48)/bars.length)-4;var gap=(AW-48-bw*bars.length)/(bars.length+1);
+      bars.forEach(function(b,i){
+        var x=24+gap+i*(bw+gap);
+        var pct=Math.min(1,b.val/b.max);
+        var bh=Math.max(3,Math.round(pct*(AH-28)));
+        var y=AH-20-bh;
+        if(pct>0.6){actx.shadowColor=b.col;actx.shadowBlur=6;}
+        actx.fillStyle=b.col;actx.fillRect(x,y,bw,bh);actx.shadowBlur=0;
+        // Value above bar
+        actx.fillStyle='rgba(255,255,255,.5)';actx.font='bold 10px sans-serif';actx.textAlign='center';
+        actx.fillText(b.val+(b.label==='Practice'?'%':''),x+bw/2,y-3);
+        // Label below
+        actx.fillStyle='rgba(200,112,144,.35)';actx.font='8px sans-serif';
+        actx.fillText(b.label,x+bw/2,AH-8);
+      });
+      // Y-axis label
+      actx.fillStyle='#333';actx.font='8px sans-serif';actx.textAlign='left';
+      actx.fillText('0',4,AH-20);actx.fillText('max',4,14);
+    },160);
+  }
+
+  // ── DRAW HYDRATION CHART ──
+  if(hyd&&hyd.data){
+    setTimeout(function(){
+      var hc=document.getElementById('hph-hyd-chart');if(!hc)return;
+      var hydEntries3=Object.entries(hyd.data).sort();var goal3=hyd.goal||80;
+      hc.width=hc.offsetWidth||320;
+      var hctx=hc.getContext('2d'),HW=hc.width,HH=80;
+      hctx.fillStyle='#0a0a0a';hctx.fillRect(0,0,HW,HH);
+      var maxOz3=Math.max(goal3,Math.max.apply(null,hydEntries3.map(function(e){return e[1]||1;})));
+      var bw3=Math.floor((HW-24)/hydEntries3.length)-3;
+      // Goal line
+      var goalY3=HH-12-Math.round((goal3/maxOz3)*(HH-18));
+      hctx.strokeStyle='rgba(88,136,176,.3)';hctx.lineWidth=1;hctx.setLineDash([3,3]);
+      hctx.beginPath();hctx.moveTo(12,goalY3);hctx.lineTo(HW-12,goalY3);hctx.stroke();hctx.setLineDash([]);
+      hctx.fillStyle='rgba(88,136,176,.4)';hctx.font='8px sans-serif';hctx.textAlign='right';
+      hctx.fillText(goal3+'oz goal',HW-4,goalY3-2);
+      // Bars
+      hydEntries3.forEach(function(e,i){
+        var x=12+i*(bw3+3);
+        var bh=e[1]>0?Math.max(4,Math.round((e[1]/maxOz3)*(HH-18))):2;
+        var y=HH-12-bh;
+        var bc=e[1]>=goal3?'#18c48a':e[1]>0?'rgba(88,136,176,.5)':'#1c1c1c';
+        if(e[1]>=goal3){hctx.shadowColor='#18c48a';hctx.shadowBlur=5;}
+        hctx.fillStyle=bc;hctx.fillRect(x,y,bw3,bh);hctx.shadowBlur=0;
+        // Oz value on taller bars
+        if(e[1]>0){
+          hctx.fillStyle='rgba(255,255,255,.35)';hctx.font='8px sans-serif';hctx.textAlign='center';
+          hctx.fillText(e[1],x+bw3/2,y-2);
+        }
+      });
+    },170);
+  }
+}
+
+function toggleE(dk){
+  var body=document.getElementById('eb-'+dk);var chev=document.getElementById('ec-'+dk);if(!body)return;
+  var open=body.classList.contains('open');
+  document.querySelectorAll('.entry-body').forEach(function(el){el.classList.remove('open');});
+  document.querySelectorAll('.entry-chev').forEach(function(el){el.style.transform='';el.style.color='rgba(200,112,144,.28)';});
+  if(!open){body.classList.add('open');if(chev){chev.style.transform='rotate(90deg)';chev.style.color='#c87090';}}
+}
+
+// ── HIS MIND ─────────────────────────────────────────────────────────────────
+function renderMind(){
+  var el=document.getElementById('mind-root');if(!el)return;
+  // Pull decoded data for charts
+  var hash=location.hash.replace(/^#/,'');
+  var moodEntries=[];var phys=null;
+  try{
+    var data=JSON.parse(decodeURIComponent(escape(atob(hash))));
+    var ml=data.d||{};
+    moodEntries=Object.entries(ml).filter(function(e){return e[1]&&e[1].s;}).sort(function(a,b){return a[0]<b[0]?-1:1;});
+    phys=data.phys||null;
+  }catch(e){}
+
+  var warm=function(txt){return '<p style="font-size:15px;color:rgba(255,255,255,.78);line-height:1.8;margin-bottom:12px">'+txt+'</p>';};
+  var sec=function(txt,col){return '<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:'+(col||'rgba(200,112,144,.55)')+';margin:22px 0 10px;border-bottom:1px solid rgba(200,112,144,.1);padding-bottom:5px">'+txt+'</div>';};
+  var tip=function(txt){return '<div style="background:rgba(200,112,144,.05);border:1px solid rgba(200,112,144,.18);border-radius:6px;padding:12px 14px;margin-bottom:10px"><p style="font-size:14px;color:rgba(200,112,144,.85);line-height:1.7;font-style:italic;margin:0">'+txt+'</p></div>';};
+  var fn=function(label,col,you,watch){
+    return '<div style="border:1px solid rgba(200,112,144,.1);border-left:3px solid '+col+';border-radius:6px;padding:14px;margin-bottom:10px;background:rgba(0,0,0,.25)">'
+      +'<div style="font-family:\'Josefin Sans\',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:'+col+';margin-bottom:8px">'+label+'</div>'
+      +'<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.72;margin-bottom:8px">'+you+'</p>'
+      +'<div style="background:rgba(200,112,144,.06);border-radius:5px;padding:9px 11px">'
+      +'<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,112,144,.45);margin-bottom:4px">What you might notice</div>'
+      +'<p style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.65;font-style:italic;margin:0">'+watch+'</p>'
+      +'</div></div>';
+  };
+
+  var h='';
+
+  // Mood trend chart
+  if(moodEntries.length>=2){
+    h+=sec('His Mood — Last 30 Days');
+    h+='<div style="background:#0a0a0a;border:1px solid rgba(200,112,144,.12);border-radius:8px;padding:14px;margin-bottom:10px">';
+    h+='<canvas id="mind-mood-chart" height="100" style="width:100%;display:block;margin-bottom:8px"></canvas>';
+    var last30=moodEntries.slice(-30);
+    h+='<div style="display:flex;justify-content:space-between;padding:0 2px">';
+    if(last30.length>0)h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;color:#444">'+last30[0][0].slice(5)+'</div>';
+    if(last30.length>1)h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;color:#444">'+last30[last30.length-1][0].slice(5)+'</div>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:14px;margin-top:6px;font-family:\'Josefin Sans\',sans-serif;font-size:10px;color:#555">';
+    h+='<span style="color:rgba(200,112,144,.5)">&#9472; Daily</span><span style="color:rgba(200,112,144,.25)">&#9472; &#9472; 7-day trend</span></div>';
+    h+='</div>';
+  }
+
+  // Activity chart if data present
+  if(phys){
+    h+=sec('His Activity — Last 14 Days');
+    h+='<div style="background:#0a0a0a;border:1px solid rgba(200,112,144,.12);border-radius:8px;padding:14px;margin-bottom:14px">';
+    h+='<canvas id="mind-act-chart" height="80" style="width:100%;display:block;margin-bottom:10px"></canvas>';
+    var wkCol=phys.workouts>=4?'#18c48a':phys.workouts>=2?'#f0c040':'#e05828';
+    var marCol=phys.martial>=3?'#18c48a':phys.martial>=1?'#f0c040':'#e05828';
+    var strCol=phys.streak>=7?'#18c48a':phys.streak>=3?'#f0c040':'#e05828';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">';
+    h+='<div><div style="font-family:\'Cormorant\',serif;font-size:26px;font-weight:300;color:'+wkCol+'">'+phys.workouts+'</div><div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-top:2px">Workouts</div></div>';
+    h+='<div><div style="font-family:\'Cormorant\',serif;font-size:26px;font-weight:300;color:'+marCol+'">'+phys.martial+'</div><div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-top:2px">Martial</div></div>';
+    h+='<div><div style="font-family:\'Cormorant\',serif;font-size:26px;font-weight:300;color:'+strCol+'">'+phys.streak+'</div><div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-top:2px">Day streak</div></div>';
+    h+='</div></div>';
+    var actNote='';
+    if(phys.workouts===0&&phys.martial===0)actNote='He hasn\'t logged any physical sessions in the last two weeks. For him, movement isn\'t optional — it\'s one of the main ways his nervous system regulates. When he\'s not moving, something is off. A gentle check-in could go a long way.';
+    else if(phys.workouts>=4&&phys.martial>=3)actNote='He\'s been showing up physically — and consistently. That\'s a really good sign. When his body is in a rhythm, his mind usually is too.';
+    else if(phys.streak>=7)actNote='That '+phys.streak+'-day streak means he\'s been doing his daily practice every single day. For him, consistency like this is how he keeps himself anchored. It means a lot, even if he doesn\'t say so.';
+    if(actNote)tip(actNote).replace('</div>','');
+    if(actNote)h+=tip(actNote);
+  }
+
+  h+=sec('Who He Is — The Heart of It');
+  h+=warm('He\'s wired in a way that\'s genuinely different from most people, and understanding that will save you both a lot of frustration. His inner world is rich, detailed, and private — not because he\'s keeping you out, but because that\'s simply where he lives. He thinks in long patterns and deep vision. He feels things quietly and intensely. He loves in ways that don\'t always look like what love looks like on the surface. None of that is a flaw. It\'s just him.');
+  h+=warm('He\'s doing real inner work through The Sovereign Traditions — examining his shadow, building his body, cultivating discipline. That matters. It\'s the reason he logs these moods. He wants you to have this window into him even when he can\'t put it into words himself.');
+
+  h+=sec('How He\'s Wired — The 8 Parts of His Mind');
+  h+=warm('Every person uses different mental modes in different amounts. Here\'s how his eight modes actually work — explained in plain language, not psychology textbook.');
+
+  h+=fn('His Vision — The Part That Sees Ahead','#9060f0',
+    'This is his strongest gear. He has an inner sense of where things are going — patterns, trajectories, what\'s coming before it arrives. It\'s almost like a compass that points toward the future. When you see him go quiet and certain about something, this is what\'s running. He\'s not being stubborn. He\'s following an internal signal that\'s usually right.',
+    'When this is working well, he seems settled and purposeful — even calm. When it\'s being interrupted constantly — too many demands at once, too much noise — he goes foggy and vague. He might seem withdrawn or hard to reach. That\'s not you. That\'s the compass being jammed. He needs quiet to find the signal again.');
+
+  h+=fn('His Builder — The Part That Makes Things Happen','#f0c040',
+    'This is how he takes his vision and turns it into something real. He builds systems, routines, schedules, structures — and he needs those things the way some people need conversation or physical touch. His routines aren\'t just habits. They\'re how he stays regulated.',
+    'When this gear gets disrupted — by unpredictability, by things being moved or cancelled or changed without warning — he gets tense. He might seem irritated over something small. He usually is, actually — but the small thing is the straw, not the load. What he really needs is for the structure to be restored. If you can help protect his routines on hard days, it matters more than you might expect.');
+
+  h+=fn('His Quiet Convictions — The Part That Knows What Matters','#e05828',
+    'Underneath everything, he has a set of values that don\'t move. He won\'t always tell you what they are. He\'ll hold them long after it would be easier to let them go. This is the part of him that cares deeply — about the right things, about doing this life well, about you — even when he doesn\'t say it.',
+    'You won\'t always see this part. But you\'ll feel it when he won\'t budge on something, or when he does something quietly for you that he never explains. Asking him "does this feel right to you?" will land much better than asking what he thinks. This function responds to warmth and trust, not logic.');
+
+  h+=fn('His Vulnerable Spot — The Present Moment','#c55',
+    'This is genuinely his weakest area, and it\'s worth knowing about because it affects both of you. He lives so naturally in his inner world — in patterns, plans, vision — that the present physical moment sometimes barely registers. He might forget to eat. He might not notice that he\'s been sitting in a painful position for two hours. He might be right next to you and feel completely unreachable.',
+    'When he\'s under real stress, this function can flip suddenly — he might become restless, impulsive, or fixated on physical things in an out-of-character way. That\'s called being "in grip." It\'s always preceded by depletion that went on too long. The fastest way through it isn\'t talking — it\'s physical care. A real meal. Sleep. Outside air. Stillness together. That\'s not giving up on the conversation. That\'s giving him the foundation he needs to actually have it.');
+
+  h+=fn('The Restless Voice — Why He Questions His Own Decisions','#5888b0',
+    'The moment he commits to a direction, a part of him starts generating other possibilities. What if this other path is better? What if he\'s missing something? This isn\'t doubt exactly — it\'s a kind of mental restlessness that activates precisely when he tries to settle.',
+    'If he seems to be questioning something he already decided on, or keeps revisiting a choice — this is usually it. It\'s not that he doesn\'t trust himself. It\'s a shadow function disrupting his natural momentum. You don\'t need to solve it. Just being steady and unhurried with him while it passes is enough.');
+
+  h+=fn('The Cold Voice — When Logic Turns Critical','#888',
+    'Under significant stress, a very precise and sometimes cutting inner critic can surface in him. It\'s forensically accurate about what\'s wrong — with himself, with situations, sometimes with you — and it\'s delivered without much warmth. This doesn\'t sound like him because it isn\'t really him. It\'s what happens when he\'s been running on empty for too long.',
+    'When this voice is out, don\'t argue with the content even if it stings — some of it might even be true. What\'s actually happening is depletion, not clarity. The right move is: "I don\'t think tonight is the right moment for this. Can we talk when we\'re both steadier?" And then keep that appointment.');
+
+  h+=fn('The Warmth He Doesn\'t Always Notice He\'s Withholding','rgba(200,112,144,.7)',
+    'This is the part of him that reads emotional connection and warmth — and it runs almost entirely below his awareness. He doesn\'t always know when he\'s being warm and when he\'s not. His silence feels neutral to him. To you, it might land cold. His selective warmth feels like care to him. To you, it might feel like approval being doled out.',
+    'This is important: when something between you has gone quiet or cool and you don\'t know why, he probably doesn\'t know why either. He didn\'t decide to pull back. He just did. Naming it plainly and without blame — "something feels different between us lately and I miss you" — is the most direct path. He can work with that. He can\'t work with what he can\'t see.');
+
+  h+=fn('The Deep Keeper — What He\'s Been Recording All Along','#18c48a',
+    'The quietest part of him has been keeping score of everything that has actually worked — every moment that was real, every time things felt right, every pattern of genuine connection. It doesn\'t speak often. When it does, it speaks with a kind of quiet certainty that\'s different from everything else he says.',
+    'When he says something simply and firmly — not with analysis, just with knowing — this is usually it. And it\'s worth paying attention to, because it\'s often the most accurate thing he\'ll say.');
+
+  h+=sec('When He\'s Running Low — What to Look For');
+  h+=warm('His depletion follows a pattern. Learning to read the early stages means you can show up for him before things get hard — not after.');
+
+  var stages=[
+    {n:'Stage 1 · He Goes Quieter Than Usual',c:'rgba(200,112,144,.35)',
+     you:'He\'s conserving. He\'s not pulling away from you specifically — he\'s just running low and going inward. This is normal and healthy.',
+     do:'Give him space without disappearing. A simple "I\'m here" and then genuinely leaving him alone to recharge is the most loving thing you can do right now.'},
+    {n:'Stage 2 · Everything Has to Be a Certain Way',c:'#e05828',
+     you:'He becomes rigid about his routines, short-tempered when plans change, frustrated by things that seem minor. He\'s using external structure to hold himself together because his internal state is getting shaky.',
+     do:'Protect the routines as much as you can. Don\'t introduce big changes right now. If something needs to shift, give him as much notice as possible. And if you can take something off his plate — do it.'},
+    {n:'Stage 3 · He Loses His Direction',c:'#e05828',
+     you:'He starts questioning things he was certain about. He can\'t articulate what he\'s building toward. He seems uncertain and a little lost in a way you might not have seen before.',
+     do:'This is a significant signal. He needs sleep, less demand, and time to be still. The conversation that would help most is: "What would feel like relief right now?" Not "what\'s wrong" — what would feel like relief.'},
+    {n:'Stage 4 · Out of Character',c:'#c55',
+     you:'Something erupts that doesn\'t look like him at all — cold and cutting, impulsive, or completely overwhelmed. This is the end of a depletion he\'s been managing alone for too long.',
+     do:'Don\'t take the content personally and don\'t argue it back. Physical care first: sleep, food, air, stillness. The conversation can wait. When he comes back to himself — and he will — that\'s when to gently name what you noticed.'}
+  ];
+  stages.forEach(function(st){
+    h+='<div style="border:1px solid rgba(200,112,144,.1);border-left:3px solid '+st.c+';border-radius:6px;padding:13px 14px;margin-bottom:10px">';
+    h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:'+st.c+';margin-bottom:8px">'+st.n+'</div>';
+    h+='<p style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.7;margin-bottom:6px">'+st.you+'</p>';
+    h+='<div style="background:rgba(200,112,144,.05);border-radius:4px;padding:8px 10px">';
+    h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(200,112,144,.4);margin-bottom:3px">What you can do</div>';
+    h+='<p style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.65;font-style:italic;margin:0">'+st.do+'</p>';
+    h+='</div></div>';
+  });
+
+  h+=sec('What He Actually Needs From You');
+  var needs=[
+    {t:'Space that doesn\'t feel like rejection',c:'rgba(200,112,144,.5)',
+     b:'When he needs to be alone, he needs to know you\'re okay. Not that you\'re fine when you\'re not — genuinely okay. If he has to manage your feelings about his need for space, he can\'t actually recharge. "Go do your thing, I\'ve got mine" and meaning it is one of the most loving things you can give him.'},
+    {t:'Specific, real appreciation',c:'rgba(200,112,144,.5)',
+     b:'"That was good" lands nowhere. "That specific thing you did on Tuesday — I noticed it and it meant something to me" will stay with him for weeks. He has a deep need to know that what he gives actually gets through. Tell him the specific thing. Use the specific moment.'},
+    {t:'Your real state, not your managed state',c:'rgba(200,112,144,.5)',
+     b:'He reads the room well but he reads it wrong when you\'re performing okay. He would genuinely rather know "something\'s heavy for me today" than have you reassure him you\'re fine when you\'re not. Give him the truth. He\'ll know what to do with it.'},
+    {t:'A physical anchor back to the present',c:'rgba(200,112,144,.5)',
+     b:'When he\'s lost in his head — which happens a lot — the fastest way to bring him back is through the body. A shared meal, no phones. A walk. Sitting close. You don\'t have to say anything about what\'s happening. Just being physically present together does something in him that conversation alone can\'t.'},
+    {t:'Being genuinely asked what he wants',c:'rgba(200,112,144,.5)',
+     b:'There\'s a quiet part of him that often doesn\'t get asked. Not "what works for us" — what does he actually want. Released from having to account for what\'s easiest for everyone. Try: "I want to know what you actually want. Not what works. Just you." And then wait for the real answer, because it won\'t come immediately.'}
+  ];
+  needs.forEach(function(n){
+    h+='<div style="border:1px solid rgba(200,112,144,.1);border-left:3px solid '+n.c+';border-radius:6px;padding:13px 14px;margin-bottom:10px">';
+    h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:'+n.c+';margin-bottom:7px">'+n.t+'</div>';
+    h+='<p style="font-size:14px;color:rgba(255,255,255,.72);line-height:1.75;margin:0">'+n.b+'</p>';
+    h+='</div>';
+  });
+
+
+  h+=sec('The Shadow Work — What He\'s Actually Doing and Why It Matters to You','#8b1a1a');
+
+  h+=warm('This section is the one he most needs you to understand. Not to excuse anything. Not to explain it away. But because without this context, things that happened between you will stay permanently confusing — and confusion is the enemy of real repair.');
+
+  h+=warm('Shadow work is a concept from Jungian psychology. The simple version: every person has parts of themselves that developed in the dark — unacknowledged, unowned, often because they were painful or because they were traits that didn\'t fit who he thought he was supposed to be. Those parts don\'t disappear. They go underground. And underground, they run. They come out sideways. They come out in the worst moments, in the worst ways, often aimed at the people closest to him. That\'s what a shadow is. And that\'s what shadow work is — turning toward those parts instead of running from them.');
+
+  h+='<div style="background:rgba(139,26,26,.06);border:1px solid rgba(139,26,26,.25);border-radius:8px;padding:14px;margin-bottom:14px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(200,80,80,.7);margin-bottom:8px">The Most Important Thing to Understand</div>';
+  h+='<p style="font-size:15px;color:rgba(255,255,255,.78);line-height:1.8;margin-bottom:8px">Shadow work is not an excuse. It is the opposite of an excuse. An excuse says "I couldn\'t help it." Shadow work says "I did that, and now I\'m going to understand exactly why, and then I\'m going to be responsible for it." The whole point is ownership. He is not using this system to explain away what he did. He is using it to face it directly — with more clarity and honesty than most people ever bring to their own behavior.</p>';
+  h+='<p style="font-size:15px;color:rgba(255,255,255,.78);line-height:1.8;margin:0">The reason this matters to you is not so that you understand him better in the abstract. It\'s so that when you see these patterns — in what already happened, or in moments that come up going forward — you have a map. You know what it is. You know it isn\'t personal in the way it felt. And you know what actually helps.</p>';
+  h+='</div>';
+
+  h+=sec('His Four Shadow Functions — What They Look Like In Real Life','rgba(180,60,60,.7)');
+  h+=warm('He has four shadow functions — four modes of thinking and feeling that operate mostly below his awareness. They don\'t have his full values behind them. They\'re cruder, more defensive, more reactive. They tend to come out under stress, under depletion, or when something in him feels threatened. Here is each one, explained in terms of what you would actually see — and what was actually happening underneath.');
+
+  // Shadow 1 — Opposing Ne
+  h+='<div style="border:1px solid rgba(88,136,176,.15);border-left:3px solid #5888b0;border-radius:8px;padding:14px;margin-bottom:12px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5888b0;margin-bottom:10px">The Restless Contrary One</div>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">His dominant function — the Vision — moves toward certainty and commitment. The shadow version does the opposite. The moment he commits to something, this part of him generates reasons why he shouldn\'t. Why something else might be better. Why the current path is almost right but not quite.</p>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">In a relationship, this shadow showed up as restlessness. As questioning things he\'d already committed to. As seeming like he was always partly somewhere else, always holding something in reserve, never fully landing. If you ever felt like you were always auditioning — like the decision was never quite made — this was a large part of why. It wasn\'t a reflection of his actual feelings for you. It was a shadow function generating noise at the worst possible times.</p>';
+  h+='<div style="background:rgba(88,136,176,.06);border-radius:5px;padding:10px 12px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(88,136,176,.5);margin-bottom:5px">What you might have felt</div>';
+  h+='<p style="font-size:13px;color:rgba(255,255,255,.55);font-style:italic;line-height:1.65;margin-bottom:8px">"He\'s not really in this. He always seems like he\'s halfway out the door. I never feel like enough."</p>';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(88,136,176,.5);margin-bottom:5px">What was actually happening</div>';
+  h+='<p style="font-size:13px;color:rgba(255,255,255,.55);font-style:italic;line-height:1.65;margin:0">A shadow function was generating instability against his own commitments. The restlessness wasn\'t directed at you. It was directed at commitment itself. The work he\'s doing now — the Commitment Log, the daily practice, the structure — is specifically training this part of him to settle. To land. To stay.</p>';
+  h+='</div></div>';
+
+  // Shadow 2 — Senex Ti
+  h+='<div style="border:1px solid rgba(104,104,104,.2);border-left:3px solid #888;border-radius:8px;padding:14px;margin-bottom:12px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:10px">The Cold Critical Voice</div>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">This is one of the hardest ones to sit with, because it\'s the one that could have done the most damage. Under enough stress — especially under sustained depletion — a part of him can become forensically, coldly critical. Not emotionally heated. Worse than that: calm, precise, and surgically accurate about what\'s wrong. With himself. With situations. And sometimes with you.</p>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">This is called grip Ti. It sounds like him but it isn\'t really him — it\'s the shadow version of his logical function, running without the warmth or the full values that normally govern how he communicates. The things said in this state can be true enough to land hard, and cold enough to leave a mark that lasts long after the moment is gone.</p>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">If you were ever on the receiving end of this — a version of him that seemed to dismantle you with a kind of clinical precision that didn\'t feel like care — that is what it was. It was a shadow function with real aim and no heart. It is not the full truth of who he is. But it is a real part of him, and he is accountable for it.</p>';
+  h+='<div style="background:rgba(104,104,104,.06);border-radius:5px;padding:10px 12px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(150,150,150,.5);margin-bottom:5px">What you might have felt</div>';
+  h+='<p style="font-size:13px;color:rgba(255,255,255,.55);font-style:italic;line-height:1.65;margin-bottom:8px">"He was so calm when he said it. That made it worse. Like he meant it. Like it was calculated. And I didn\'t know how to come back from that."</p>';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(150,150,150,.5);margin-bottom:5px">What was actually happening</div>';
+  h+='<p style="font-size:13px;color:rgba(255,255,255,.55);font-style:italic;line-height:1.65;margin:0">His depletion had been building quietly for a long time before it erupted. The calm wasn\'t cruelty — it was the absence of access to his normal warmth and care, because he was too depleted to reach it. That doesn\'t make it okay. But it means the person who said those things wasn\'t operating with the full range of who he is. The shadow work he\'s doing now includes learning to catch this rising before it erupts — and to name it instead of deploying it.</p>';
+  h+='</div></div>';
+
+  // Shadow 3 — Trickster Fe
+  h+='<div style="border:1px solid rgba(200,112,144,.15);border-left:3px solid rgba(200,112,144,.5);border-radius:8px;padding:14px;margin-bottom:12px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(200,112,144,.65);margin-bottom:10px">The Relational Temperature He Didn\'t Know He Was Setting</div>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">This is the shadow function that may have caused the most confusion — and the most quiet damage — because it operated entirely without his awareness. His trickster function reads the relational field and affects it without his knowledge. He didn\'t decide to do these things. They happened through him, not by him.</p>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">What this looks like: silence that functioned as punishment, even though he experienced it as neutral. Warmth extended to you when you behaved in ways he approved of, and quietly withheld when you didn\'t — not as a conscious decision, but as a pattern. Moral language used to frame what were actually preferences or wounds. "I just value honesty" said at the exact moment that honesty served as a weapon. "I need space" deployed in a way that was actually meant to hurt.</p>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">You would have felt these things clearly and precisely, while he would have experienced himself as simply being honest, or simply needing space, or simply being quiet. That gap — between what you received and what he believed he was doing — is the trickster. And it is genuinely one of the hardest patterns in him to address, because he had to first believe it was happening before he could begin to change it.</p>';
+  h+='<div style="background:rgba(200,112,144,.05);border-radius:5px;padding:10px 12px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,112,144,.4);margin-bottom:5px">What you might have felt</div>';
+  h+='<p style="font-size:13px;color:rgba(255,255,255,.55);font-style:italic;line-height:1.65;margin-bottom:8px">"Hot and cold. Never knowing which version I was going to get. Walking on eggshells without knowing what the rules were, because the rules kept changing. Feeling like his warmth had to be earned but nobody told me how."</p>';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,112,144,.4);margin-bottom:5px">What was actually happening</div>';
+  h+='<p style="font-size:13px;color:rgba(255,255,255,.55);font-style:italic;line-height:1.65;margin:0">A shadow function was managing the relational field on autopilot — deploying warmth and withdrawal as currency without his conscious permission. This is not who he wants to be. The Relational Scan practice he does now — naming who he interacted with, what temperature he brought, whether the warmth or distance was a conscious choice — is directly targeting this. It\'s slow work. But it\'s the right work.</p>';
+  h+='</div></div>';
+
+  // Shadow 4 — Daemon Si
+  h+='<div style="border:1px solid rgba(24,196,138,.12);border-left:3px solid #18c48a;border-radius:8px;padding:14px;margin-bottom:12px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#18c48a;margin-bottom:10px">The Keeper of What Was Lost</div>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">His deepest shadow function is also his most honest one. Si, the Daemon, has been keeping the real record. Not the constructed narrative he told himself, not the version of events that served his ego — the actual record of what happened, what was lost, what he damaged, what mattered and what he failed to protect. When this function speaks, it speaks with a weight that he can\'t rationalize away. It usually comes at 3am. It comes in the form of something he did or said that suddenly he can\'t unhear.</p>';
+  h+='<p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:10px">This function is not comfortable. But it\'s the most important one for repair — because it carries the actual truth about what he did, not a shadow-softened version of it. When he\'s doing shadow work and it gets hard, it\'s usually because this function is surfacing something real that he\'d managed to keep at a distance. That is the work working.</p>';
+  h+='<div style="background:rgba(24,196,138,.04);border-radius:5px;padding:10px 12px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(24,196,138,.4);margin-bottom:5px">What this means for you</div>';
+  h+='<p style="font-size:13px;color:rgba(255,255,255,.55);font-style:italic;line-height:1.65;margin:0">When he tells you something he did was wrong — not because you caught him or because it\'s convenient, but quietly, without being asked — that\'s the Daemon speaking. It means he\'s not managing how he appears anymore. He\'s accessing the real record. That kind of honesty is rare and it costs him. It\'s worth receiving it as the serious thing it is.</p>';
+  h+='</div></div>';
+
+  h+=sec('What Shadow Work Actually Looks Like From the Outside','rgba(180,60,60,.5)');
+  h+=warm('He is not sitting in a therapy office talking about his feelings. Shadow work in The Sovereign Traditions is structured, daily, and uncomfortable. It involves specific practices — written exercises, evening reviews that ask hard questions, deliberate examination of where he leaked energy or acted out of alignment. The mood log you\'ve been reading is part of it. The warrior practice is part of it. The daily structure is part of it. All of it is aimed at building a version of himself that has fewer gaps between who he says he is and how he actually behaves.');
+  h+=warm('From the outside, it can look like: more quiet than usual. A kind of seriousness that wasn\'t there before. Occasionally saying something out loud that he wouldn\'t have admitted before. Naming a pattern in himself instead of defending it. Being slower to react. Sometimes being harder on himself than he needs to be.');
+
+  h+='<div style="background:rgba(200,112,144,.04);border:1px solid rgba(200,112,144,.15);border-radius:8px;padding:14px;margin-bottom:14px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,112,144,.5);margin-bottom:10px">Signs the Work Is Actually Happening</div>';
+  var signs=[
+    'He names something he did wrong without you bringing it up first.',
+    'He catches himself in a pattern and says so, even when saying so is embarrassing.',
+    'He asks how something landed for you instead of explaining why he did it.',
+    'He sits with your feelings without immediately trying to fix or rebut them.',
+    'He references the shadow work directly — naming a function, naming a pattern — because he\'s building a language for the parts of himself he used to have no words for.',
+    'He keeps showing up to the daily practice even when he doesn\'t want to. Especially when he doesn\'t want to.'
+  ];
+  signs.forEach(function(s){
+    h+='<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(200,112,144,.06)">';
+    h+='<div style="color:rgba(24,196,138,.6);flex-shrink:0;margin-top:1px">\u2714</div>';
+    h+='<p style="font-size:14px;color:rgba(255,255,255,.68);line-height:1.65;margin:0">'+s+'</p>';
+    h+='</div>';
+  });
+  h+='</div>';
+
+  h+=sec('Your Part in This — What Helps and What Doesn\'t','rgba(200,112,144,.55)');
+  h+=warm('You are not his therapist. You are not responsible for his healing. And you are not obligated to forgive anything before you\'re ready. This section is not asking you to take care of him through his shadow work. It\'s asking you to know what actually helps the process — and what, with the best of intentions, can accidentally get in the way.');
+
+  var helps=[
+    {t:'Receiving honesty without using it as ammunition',
+     b:'When he names something he did — to you or about himself — the most useful thing you can do is receive it and let it land. Not immediately minimize it, not file it away for later, not use it to prove a point in the next argument. Just let the honesty be what it is. For someone whose shadow function has been running the relational field for years, genuine honesty is a new and uncertain thing. How it\'s received the first few times determines whether it keeps coming.'},
+    {t:'Telling him specifically what hurt — not as an accusation, as information',
+     b:'"When you went silent after that conversation, I felt like you\'d decided I wasn\'t worth talking to." That\'s information he can work with. "You always do this" is a war he can only defend himself against. He needs the specific moment, the specific thing, the specific feeling — because his trickster function genuinely didn\'t register what it was doing. He needs the map, not the verdict.'},
+    {t:'Letting repair be real repair — not conditional peace',
+     b:'Real repair doesn\'t mean everything is fine and the thing that happened is erased. It means the thing that happened is named, owned, and something structurally changes. If he says he\'s working on the pattern that caused something, what that needs from you is: enough space to see whether it actually changes. Not a clean slate. Not forgetting. Just room to demonstrate over time that the work is real.'},
+    {t:'Not carrying the whole relational field alone',
+     b:'For a long time, his trickster function meant you were probably doing most of the emotional work of the relationship — reading the temperature, managing his moods, trying to figure out what state he was in and adjusting accordingly. That was never supposed to be your job alone. One of the things the shadow work is meant to change is exactly this. You don\'t have to keep doing all of it.'},
+    {t:'Saying when you\'re not okay — for real',
+     b:'He needs your actual state, not your managed state. If something he did still hurts, and he thinks it\'s been repaired because you\'ve been gracious about it, the repair is incomplete. He has a deep capacity to sit with hard truths when they\'re given to him plainly. "I want to move forward and I\'m still carrying something from that" is something he can actually work with. Protecting him from it doesn\'t help either of you.'}
+  ];
+  helps.forEach(function(h2){
+    h+='<div style="border:1px solid rgba(200,112,144,.1);border-left:3px solid rgba(200,112,144,.35);border-radius:6px;padding:13px 14px;margin-bottom:10px">';
+    h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(200,112,144,.55);margin-bottom:7px">'+h2.t+'</div>';
+    h+='<p style="font-size:14px;color:rgba(255,255,255,.72);line-height:1.78;margin:0">'+h2.b+'</p>';
+    h+='</div>';
+  });
+
+  h+='<div style="background:rgba(139,26,26,.06);border:1px solid rgba(139,26,26,.2);border-radius:8px;padding:14px;margin-bottom:14px">';
+  h+='<div style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,80,80,.55);margin-bottom:8px">What Doesn\'t Help</div>';
+  var nhelps=[
+    'Using his shadow work vocabulary against him — "that\'s just your trickster" in the middle of a real argument bypasses the real thing and makes him feel like a specimen.',
+    'Expecting the work to mean he never does these things again. Shadow integration is not a cure. It\'s the development of awareness, early warning, and honest repair. He will still have hard moments. The difference is what he does with them.',
+    'Forgiveness before you\'re ready. Premature forgiveness is not forgiveness — it\'s management. If you say it\'s okay before it is, he will sense it, and both of you will be less safe with each other.',
+    'Carrying his guilt for him. He needs to sit in the full weight of what he did. If you reassure him too quickly, you take away the most important part of the repair process — his own reckoning with it.'
+  ];
+  nhelps.forEach(function(n){
+    h+='<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(139,26,26,.08)">';
+    h+='<div style="color:rgba(200,80,80,.5);flex-shrink:0;margin-top:1px">\u2022</div>';
+    h+='<p style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.65;margin:0">'+n+'</p>';
+    h+='</div>';
+  });
+  h+='</div>';
+
+  h+=sec('Why He Made This For You','rgba(200,112,144,.4)');
+  h+=warm('He built this system partly for himself — the structure, the discipline, the daily practice. But the mood log, the Her View link, this whole page — that\'s for you. He is trying to give you something he hasn\'t always been able to give directly: transparency about what\'s happening inside him, even when he can\'t say it out loud.');
+  h+=warm('The fact that you\'re reading this means something. It means he trusted you with the real map. Not the version of him that manages impressions, but the version that\'s trying to understand himself honestly — including the parts that haven\'t been good. That takes something. And you being here, reading this, takes something too.');
+  h+='<div style="background:rgba(200,112,144,.04);border:1px solid rgba(200,112,144,.15);border-radius:8px;padding:16px;margin-bottom:14px;text-align:center">';
+  h+='<p style="font-family:\'Cormorant\',serif;font-size:20px;font-weight:300;color:#c87090;line-height:1.65;font-style:italic;margin:0">The shadow is not what makes a person bad.<br>The shadow unacknowledged is.<br>He is acknowledging it.</p>';
+  h+='</div>';
+
+  h+=tip('If you ever want to talk to him about something in here — something that named what you went through — the best opening is a simple and direct one. "I read something in the app and I want to tell you how it landed for me." He will be able to hear that. He built this partly so that conversation could finally happen.');
+
+  h+='<div class="footer">The Sovereign Traditions \u00b7 Written for The Unspent</div>';
+
+  el.innerHTML=h;
+
+  // Draw mood trend chart
+  setTimeout(function(){
+    var cv=document.getElementById('mind-mood-chart');
+    if(cv&&moodEntries.length>=2){
+      var last30=moodEntries.slice(-30);
+      cv.width=cv.offsetWidth||320;
+      var ctx=cv.getContext('2d'),W=cv.width,H=100;
+      ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,W,H);
+      // Grid lines
+      [3,5,7].forEach(function(v){
+        var y=H-8-Math.round(((v-1)/9)*(H-16));
+        ctx.strokeStyle='rgba(200,112,144,.08)';ctx.lineWidth=1;ctx.setLineDash([2,4]);
+        ctx.beginPath();ctx.moveTo(12,y);ctx.lineTo(W-12,y);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='rgba(200,112,144,.25)';ctx.font='8px sans-serif';ctx.textAlign='right';
+        ctx.fillText(v,10,y+3);
+      });
+      var n=last30.length,stepX=(W-28)/(n-1);
+      var sy=function(v){return H-8-Math.round(((v-1)/9)*(H-16));};
+      // Daily line
+      ctx.beginPath();ctx.strokeStyle='rgba(200,112,144,.6)';ctx.lineWidth=1.5;
+      ctx.shadowColor='rgba(200,112,144,.4)';ctx.shadowBlur=4;
+      last30.forEach(function(e,i){var x=14+i*stepX;var y=sy(e[1].s);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});
+      ctx.stroke();ctx.shadowBlur=0;
+      // Dots
+      last30.forEach(function(e,i){
+        var x=14+i*stepX;var y=sy(e[1].s);
+        var dc=e[1].s<=3?'#c55':e[1].s<=5?'#888':e[1].s<=7?'#18c48a':'#f0c040';
+        ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fillStyle=dc;ctx.fill();
+      });
+      // 7-day rolling avg
+      if(n>=7){
+        ctx.beginPath();ctx.strokeStyle='rgba(200,112,144,.22)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+        last30.forEach(function(e,i){
+          if(i<6)return;
+          var w=last30.slice(i-6,i+1).map(function(x){return x[1].s;});
+          var avg=w.reduce(function(a,b){return a+b;},0)/7;
+          var x=14+i*stepX;var y=sy(avg);
+          if(i===6)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+        });
+        ctx.stroke();ctx.setLineDash([]);
+      }
+    }
+    // Activity bar chart
+    var ac=document.getElementById('mind-act-chart');
+    if(ac&&phys){
+      ac.width=ac.offsetWidth||320;
+      var actx=ac.getContext('2d'),AW=ac.width,AH=80;
+      actx.fillStyle='#0a0a0a';actx.fillRect(0,0,AW,AH);
+      var bars=[
+        {label:'Workouts',val:phys.workouts,max:10,col:phys.workouts>=4?'#18c48a':phys.workouts>=2?'#f0c040':'#e05828'},
+        {label:'Martial',val:phys.martial,max:10,col:phys.martial>=3?'#18c48a':phys.martial>=1?'#f0c040':'#e05828'},
+        {label:'Streak',val:phys.streak,max:30,col:phys.streak>=7?'#18c48a':phys.streak>=3?'#f0c040':'#e05828'},
+        {label:'Practice',val:phys.avgComp,max:100,col:phys.avgComp>=80?'#18c48a':phys.avgComp>=50?'#f0c040':'#e05828'}
+      ];
+      var bw=Math.floor((AW-32)/(bars.length*2-1));
+      bars.forEach(function(b,i){
+        var x=16+i*(bw*2+2);
+        var pct=Math.min(1,b.val/b.max);
+        var bh=Math.max(3,Math.round(pct*(AH-24)));
+        var y=AH-16-bh;
+        if(pct>0.6){actx.shadowColor=b.col;actx.shadowBlur=5;}
+        actx.fillStyle=b.col;actx.fillRect(x,y,bw,bh);actx.shadowBlur=0;
+        actx.fillStyle='rgba(200,112,144,.35)';actx.font='8px sans-serif';actx.textAlign='center';
+        actx.fillText(b.label,x+bw/2,AH-4);
+        actx.fillStyle='rgba(255,255,255,.4)';actx.textAlign='center';
+        actx.fillText(b.val+(b.label==='Practice'?'%':''),x+bw/2,y-3);
+      });
+    }
+  },150);
+}
+
+// ── EVENTS ───────────────────────────────────────────────────────────────────
+function getEvents(){try{return JSON.parse(localStorage.getItem(EV_KEY))||[];}catch(e){return[];}}
+function saveEvents(ev){try{localStorage.setItem(EV_KEY,JSON.stringify(ev));}catch(e){}}
+
+function fmtDate(ds){
+  var today=new Date();today.setHours(0,0,0,0);
+  var d=new Date(ds+'T00:00:00');var diff=Math.round((d-today)/86400000);
+  if(diff===0)return'Today';if(diff===1)return'Tomorrow';if(diff===-1)return'Yesterday';
+  if(diff>1&&diff<=14)return'In '+diff+' days';
+  if(diff<-1&&diff>=-14)return Math.abs(diff)+' days ago';
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:Math.abs(diff)>300?'numeric':undefined});
+}
+
+function renderEvents(){
+  var el=document.getElementById('events-root');if(!el)return;
+  var events=getEvents();
+  var today=new Date();today.setHours(0,0,0,0);
+  var upcoming=events.filter(function(e){return new Date(e.date+'T00:00:00')>=today;});
+  var past=events.filter(function(e){return new Date(e.date+'T00:00:00')<today;});
+  var h='';
+  h+='<h2 style="font-family:\'Cormorant\',serif;font-size:24px;font-weight:300;color:#fff;letter-spacing:.1em;margin-bottom:4px">My Events</h2>';
+  h+='<p style="font-size:13px;color:var(--text3);margin-bottom:16px;line-height:1.6">Doctor\'s appointments, reminders, anything that\'s yours. Lives on your device only.</p>';
+  h+='<div id="add-ev-form" style="display:none;background:#0a0a0a;border:1px solid rgba(200,112,144,.2);border-radius:8px;padding:14px;margin-bottom:12px">';
+  h+='<div class="sec-lbl" style="margin-bottom:10px">New Event</div>';
+  h+='<input type="text" id="ev-title" class="ev-input" placeholder="Doctor appointment \u00b7 Reminder \u00b7 Note\u2026" style="margin-bottom:8px">';
+  h+='<input type="date" id="ev-date" class="ev-input" style="margin-bottom:8px">';
+  h+='<textarea id="ev-note" class="ev-input" placeholder="Details, location, notes (optional)" rows="2" style="margin-bottom:10px;resize:none"></textarea>';
+  h+='<div style="display:flex;gap:8px"><button onclick="submitEvent()" class="ev-btn primary" style="flex:1">Add</button><button onclick="hideAddForm()" class="ev-btn" style="flex:1">Cancel</button></div>';
+  h+='</div>';
+  h+='<button onclick="showAddForm()" id="add-ev-btn" class="ev-btn primary" style="width:100%;margin-bottom:16px">+ Add Event</button>';
+  if(!events.length){
+    h+='<div style="font-size:14px;color:#333;font-style:italic;text-align:center;padding:24px;border:1px dashed #1a1a1a;border-radius:8px">No events yet.</div>';
+  } else {
+    upcoming.forEach(function(ev){
+      var ds=fmtDate(ev.date);
+      var col=ds==='Today'?'#c87090':ds==='Tomorrow'?'#f0c040':'#5888b0';
+      h+='<div class="ev-card" style="border-left-color:'+col+'">';
+      h+='<div style="display:flex;align-items:flex-start;gap:8px">';
+      h+='<div style="flex:1;min-width:0"><div class="ev-date-lbl" style="color:'+col+'">'+ds+' \u00b7 '+ev.date.slice(5).replace('-','/')+'</div>';
+      h+='<div class="ev-title-txt">'+ev.title+'</div>';
+      if(ev.note)h+='<div class="ev-note-txt">'+ev.note+'</div>';
+      h+='</div><button onclick="delEvent(\''+ev.id+'\')" class="ev-del">\u2715</button></div></div>';
+    });
+    if(past.length){
+      h+='<div onclick="togglePast()" id="past-toggle" style="font-family:\'Josefin Sans\',sans-serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#2a2a2a;cursor:pointer;text-align:center;padding:12px 0;margin-top:4px">Past events ('+past.length+')</div>';
+      h+='<div id="past-list" style="display:none">';
+      past.slice().reverse().forEach(function(ev){
+        h+='<div class="ev-card" style="opacity:.35;border-left-color:#333">';
+        h+='<div style="display:flex;align-items:flex-start;gap:8px">';
+        h+='<div style="flex:1;min-width:0"><div class="ev-date-lbl" style="color:#555">'+fmtDate(ev.date)+' \u00b7 '+ev.date.slice(5).replace('-','/')+'</div>';
+        h+='<div class="ev-title-txt" style="color:#666">'+ev.title+'</div>';
+        if(ev.note)h+='<div class="ev-note-txt">'+ev.note+'</div>';
+        h+='</div><button onclick="delEvent(\''+ev.id+'\')" class="ev-del">\u2715</button></div></div>';
+      });
+      h+='</div>';
+    }
+  }
+  h+='<div class="footer">Stored on your device only.</div>';
+  el.innerHTML=h;
+  var di=document.getElementById('ev-date');
+  if(di&&!di.value)di.value=todayStr();
+}
+
+function showAddForm(){
+  var f=document.getElementById('add-ev-form');var b=document.getElementById('add-ev-btn');
+  if(f)f.style.display='block';if(b)b.style.display='none';
+  setTimeout(function(){var t=document.getElementById('ev-title');if(t)t.focus();},100);
+}
+function hideAddForm(){
+  var f=document.getElementById('add-ev-form');var b=document.getElementById('add-ev-btn');
+  if(f)f.style.display='none';if(b)b.style.display='block';
+}
+function submitEvent(){
+  var te=document.getElementById('ev-title');var de=document.getElementById('ev-date');var ne=document.getElementById('ev-note');
+  var title=te?te.value.trim():'';var date=de?de.value:'';var note=ne?ne.value.trim():'';
+  if(!title){toast('Add a title.');return;}if(!date){toast('Pick a date.');return;}
+  var events=getEvents();
+  events.push({id:Date.now().toString(),date:date,title:title,note:note,created:Date.now()});
+  events.sort(function(a,b){return a.date<b.date?-1:1;});
+  saveEvents(events);toast('Event added.');
+  hideAddForm();renderEvents();
+}
+function delEvent(id){
+  saveEvents(getEvents().filter(function(e){return e.id!==id;}));
+  renderEvents();toast('Removed.');
+}
+function togglePast(){
+  var l=document.getElementById('past-list');var t=document.getElementById('past-toggle');
+  if(!l)return;var o=l.style.display==='block';
+  l.style.display=o?'none':'block';if(t)t.style.color=o?'#2a2a2a':'#666';
+}
+
+renderMood();
+</script>
+</body>
+</html>
